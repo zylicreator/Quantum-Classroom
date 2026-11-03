@@ -1,0 +1,6 @@
+.ec-workspace-nav { display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0; }
+.ec-workspace-button { padding:12px 20px;font-size:16px;font-weight:600;white-space:normal; }
+.ec-workspace-button[aria-pressed="true"] { background:var(--primary);color:var(--primary-foreground);border-color:var(--primary); }
+.ec-export-all { margin-left:auto;white-space:normal; }
+.ec-workspace-note { color:var(--muted-foreground);font-size:13px;line-height:1.65;margin:10px 0 26px;max-width:950px; }
+@media(max-width:600px) { .ec-workspace-nav { display:grid;grid-template-columns:1fr 1fr; } .ec-export-all { grid-column:1/-1;margin-left:0; } .ec-workspace-button { padding:11px 9px;font-size:14px; } }

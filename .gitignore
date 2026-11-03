@@ -218,3 +218,28 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Quantum Classroom web app, developer output, and classroom records
+node_modules/
+artifacts/
+dist/
+validation/
+playwright-report/
+test-results/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# Exported classroom reflections stay on the user's computer.
+*learning-record*.json
+*classroom-record*.json
+electron-cloud-atoms-molecules-record.json
+*.zip

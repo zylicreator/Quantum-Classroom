@@ -1,0 +1,21 @@
+{
+  "name": "electron-cloud-classroom",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline bilingual classroom experiments in atomic and molecular orbitals, probability and independent measurements.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node assets/verify_model.js && node assets/verify_atoms.js && node assets/verify_molecular.js",
+    "test:browser": "node tests/qa_workspace.cjs && node tests/qa_controls.cjs && node tests/qa_atomic.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zylicreator/Quantum-Classroom.git"
+  }
+}

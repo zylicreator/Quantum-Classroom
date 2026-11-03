@@ -1,0 +1,31 @@
+const fs=require('fs'),path=require('path'),assert=require('assert/strict'),crypto=require('crypto');
+const {pathToFileURL}=require('url');
+const {launchBrowser}=require('./browser.cjs');
+const root=path.resolve(__dirname,'..'),output=path.join(root,'artifacts','atomic');
+fs.mkdirSync(output,{recursive:true});
+const file=path.join(root,'electron-cloud-classroom.html'),errors=[],requests=[];
+let browser,page;
+(async()=>{
+browser=await launchBrowser();
+const context=await browser.newContext({viewport:{width:1280,height:1000},locale:'zh-CN'});page=await context.newPage();
+page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))requests.push(r.url());});
+await page.goto(pathToFileURL(file).href);await page.waitForFunction(()=>window.ElectronClassroom);
+assert.equal(await page.locator('html').getAttribute('lang'),'zh-CN');
+await page.locator('[data-lesson="nodes"]').click();await page.locator('[name="ec-task-prediction"][value="b"]').check();await page.click('#ec-task-start');await page.locator('#ec-task-panel').evaluate(e=>e.open=true);
+assert.equal(await page.locator('#ec-task-reflection').isDisabled(),false);
+assert.equal(await page.locator('[data-lesson="nodes"]').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(23, 92, 211)');
+await page.selectOption('#ec-color','sphere');assert.equal(await page.locator('#ec-task-reflection').isDisabled(),true);assert.match(await page.locator('#ec-task-progress').innerText(),/恢复本课参数/);
+await page.selectOption('#ec-color','phase');assert.equal(await page.locator('#ec-task-reflection').isDisabled(),false);
+await page.click('#ec-guided-mode');assert.equal(await page.locator('#ec-task-reflection').isDisabled(),true);await page.click('#ec-explore-mode');assert.equal(await page.locator('#ec-task-reflection').isDisabled(),false);
+await page.locator('#ec-task-panel').evaluate(e=>e.open=true);await page.locator('[name="ec-task-conclusion"][value="b"]').check();await page.fill('#ec-task-reflection','Colors label signs of the real wavefunction; position measurements sample its squared magnitude.');await page.click('#ec-task-check');
+const before=await page.evaluate(()=>({s:ElectronLab.snapshot(),a:ElectronClassroom.getAnswers()}));await page.click('#ec-lang-en');assert.deepEqual(await page.evaluate(()=>({s:ElectronLab.snapshot(),a:ElectronClassroom.getAnswers()})),before);
+assert.match(await page.locator('#ec-task-feedback').innerText(),/not automatically graded/);assert.match(await page.locator('#ec-clt-title').innerText(),/Central limit theorem/);
+await page.locator('#ec-teacher-panel').evaluate(e=>e.open=true);await page.click('#ec-project');assert.equal(await page.locator('.ec-task-option').first().evaluate(e=>getComputedStyle(e).fontSize),'18px');await page.click('#ec-project');
+const layouts=[];for(const width of [1280,390]){await page.setViewportSize({width,height:1000});for(const lang of ['zh','en']){await page.click('#ec-lang-'+lang);const layout=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));assert.ok(layout.scroll<=layout.width+1);layouts.push({lang,...layout});}}
+await page.click('#ec-lang-en');await page.locator('#ec-teacher-panel').evaluate(e=>e.open=false);await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:path.join(output,'classroom-mobile-en.png')});
+await page.setViewportSize({width:1280,height:1100});await page.click('#ec-lang-zh');await page.locator('#ec-task-panel').evaluate(e=>e.open=false);await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:path.join(output,'classroom-desktop-zh.png')});
+await page.locator('#ec-main-plots').screenshot({path:path.join(output,'classroom-nodes-zh.png')});
+const leftovers=(await page.locator('body').innerText()).split('\n').filter(s=>/Central limit theorem/.test(s));assert.equal(leftovers.length,0);
+assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);assert.equal(await page.locator('script[src],link[rel="stylesheet"][href]').count(),0);
+await browser.close();const report={passed:true,sha256:crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),pageErrors:errors,externalRequests:requests,layouts,checks:['Nodes color and learning-mode changes update prerequisites immediately','Restored parameters allow a new check','Choice feedback does not grade written explanation','Language switch preserves data and answers','Projection task options are 18px','Final desktop/mobile bilingual layouts fit viewport','Final offline bundle has no network requests or page errors']};fs.writeFileSync(path.join(output,'qa-atomic.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({passed:true,checks:report.checks.length,sha256:report.sha256}));
+})().catch(async e=>{console.error(e.stack);if(page)await page.screenshot({path:path.join(output,'qa-atomic-failure.png'),fullPage:true}).catch(()=>{});fs.writeFileSync(path.join(output,'qa-atomic-failure.json'),JSON.stringify({error:e.stack,pageErrors:errors,externalRequests:requests},null,2));process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();});

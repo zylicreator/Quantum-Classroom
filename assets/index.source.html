@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n-text="t000">电子云课堂实验室 · 原子与分子</title>
+  <link rel="stylesheet" href="visualize.css">
+  <link rel="stylesheet" href="classroom.css">
+  <link rel="stylesheet" href="workspace.css">
+  <link rel="stylesheet" href="molecular.css">
+  <link rel="stylesheet" href="molecular_lessons.css">
+  <style>
+    html > body { margin: 0; padding: 24px; font-family: "Segoe UI", "Microsoft YaHei", sans-serif; }
+    main { max-width: 1120px; margin: auto; }
+    #hydrogen-demo { position: relative; }
+    .intro { max-width: 860px; font-size:16px; line-height:1.6; }
+    .ec-learning-modes, .ec-guide-scenes, .ec-guide-steps, .ec-guide-actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .ec-learning-modes { margin:18px 0; }
+    .ec-learning-modes button[aria-pressed="true"], .ec-guide-scenes button[aria-pressed="true"], .ec-guide-steps button[aria-current="step"] { background:var(--primary); color:var(--primary-foreground); border-color:var(--primary); }
+    .ec-guide { padding:20px; border:1px solid var(--border); border-radius:12px; background:var(--muted); }
+    .ec-guide h2 { margin:18px 0 8px; }
+    .ec-guide p { font-size:14px; line-height:1.6; }
+    .ec-guide #ec-guide-description { font-size:16px; }
+    .ec-guide > .text-muted { color:var(--foreground); opacity:.8; }
+    .ec-guide .btn, .ec-learning-modes .btn { font-size:14px; }
+    .ec-guide-scenes { margin:8px 0 16px; }
+    .ec-guide-steps { border-top:1px solid var(--border); padding-top:16px; }
+    .ec-guide-steps button { flex:1 1 200px; text-align:left; white-space:normal; }
+    .ec-guide-actions { margin-top:14px; }
+    .ec-guide-feedback { margin-top:14px; margin-bottom:0; min-height:24px; }
+    .ec-simple-note { margin:16px 0; padding:12px 16px; border-left:3px solid var(--viz-series-1); background:var(--muted); font-size:14px; line-height:1.6; }
+    .ec-guided [data-advanced] { display:none !important; }
+    .ec-guided #ec-one, .ec-guided #ec-batch, .ec-guided #ec-reveal { display:none; }
+    .ec-guided[data-guide-step="0"] #ec-observation-controls, .ec-guided[data-guide-step="0"] #ec-play, .ec-guided[data-guide-step="0"] #ec-finish { display:none; }
+    .ec-guided[data-guide-step="0"] #ec-convergence-section, .ec-guided[data-guide-step="1"] #ec-convergence-section { display:none; }
+    .ec-guided[data-guide-step="0"] #ec-main-plots, .ec-guided[data-guide-step="1"] #ec-main-plots { display:block; max-width:520px; margin-inline:auto; }
+    .ec-guided:not([data-guide-step="2"]) #ec-radius-field { display:none; }
+    .section-space { margin-top: 24px; }
+    .ec-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .ec-control-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 18px 0; }
+    .ec-view-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 12px 0; }
+    .ec-atom-note { padding: 12px 0; border-block: 1px solid var(--border); }
+    .ec-atom-note p { margin: 6px 0; }
+    .ec-configuration { overflow-wrap: anywhere; }
+    .ec-table-wrap { overflow-x: auto; }
+    .ec-orbital-box { display: inline-block; border: 1px solid var(--border); padding: 2px 4px; margin-right: 3px; min-width: 22px; text-align: center; }
+    .ec-view-grid label { min-width: 0; }
+    .ec-cloud canvas { touch-action: none; cursor: grab; }
+    .ec-cloud canvas:active { cursor: grabbing; }
+    .ec-orbital-info { padding: 12px 0; border-block: 1px solid var(--border); }
+    .ec-catalog { width: 100%; border-collapse: collapse; }
+    .ec-catalog td, .ec-catalog th { padding: 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    .ec-control-grid label { min-width: 0; }
+    .form-label { line-height:1.5; }
+    .ec-row .btn, .ec-guide-actions .btn { white-space:normal; }
+    .ec-catalog th { overflow-wrap:anywhere; }
+    .ec-plots { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 22px; }
+    .ec-plots > section { min-width: 0; }
+    .ec-chart { display: block; width: 100%; }
+    .ec-chart text { fill: var(--foreground); font-size: 12px; font-weight: 400; }
+    .ec-chart .domain, .ec-chart .tick line { stroke: var(--border); }
+    .ec-cloud { position: relative; width: 100%; }
+    .ec-cloud canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .ec-cloud svg { position: relative; pointer-events: none; }
+    .ec-caption { margin-top: 8px; }
+    .ec-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 8px 0; }
+    .ec-swatch { display: inline-block; vertical-align: middle; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+    .ec-legend-button { background: transparent; border: 0; border-radius: 0; padding: 0; color: var(--foreground); font: inherit; font-size: var(--font-size-base); }
+    .ec-legend-button[aria-pressed="false"] { opacity: .5; }
+    .ec-line-swatch { display: inline-block; width: 22px; height: 0; vertical-align: middle; margin-right: 6px; border-top: 2px solid var(--viz-series-1); }
+    .ec-line-swatch.theory { border-color: var(--viz-series-3); border-top-style: dashed; }
+    .ec-tooltip { position: absolute; pointer-events: none; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; z-index: 2; max-width: min(340px, 100%); }
+    .ec-clt-fields { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; margin: 16px 0; }
+    .ec-clt-fields > label { flex: 1 1 160px; }
+    .ec-clt-fields > button { flex: 0 0 auto; }
+    .ec-note { max-width: 960px; }
+    .ec-formula { overflow-wrap: anywhere; }
+    details { margin-top: 20px; }
+    summary { color: var(--foreground); }
+    [hidden] { display: none !important; }
+    @media (max-width: 780px) { .ec-control-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ec-plots { grid-template-columns: minmax(0, 1fr); } .ec-view-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 420px) { html > body { padding: 14px; } .ec-control-grid, .ec-view-grid { grid-template-columns: minmax(0, 1fr); } }
+  </style>
+</head>
+<body>
+<main>
+    <div class="ec-utilitybar">
+      <span class="ec-product-label ec-product-name" data-i18n-text="utility-product">电子云课堂实验室 · 原子与分子</span>
+      <div class="ec-language-switch" role="group" aria-label="界面语言" data-i18n-aria-label="utility-language">
+        <button type="button" class="btn" id="ec-lang-zh" lang="zh-CN" aria-pressed="true" title="切换到中文" aria-label="使用中文界面" data-i18n-title="utility-zh-title" data-i18n-aria-label="utility-zh-aria">中文</button>
+        <button type="button" class="btn" id="ec-lang-en" lang="en" aria-pressed="false" title="切换到英文" aria-label="使用英文界面" data-i18n-title="utility-en-title" data-i18n-aria-label="utility-en-aria">English</button>
+      </div>
+    </div>
+
+  <nav class="ec-workspace-nav" aria-label="实验室" data-i18n-aria-label="workspace-label">
+    <button type="button" class="btn ec-workspace-button" id="ec-workspace-atom" aria-controls="hydrogen-demo" aria-pressed="true" data-i18n-text="workspace-atom">原子轨道</button>
+    <button type="button" class="btn ec-workspace-button" id="ec-workspace-molecule" aria-controls="molecular-demo" aria-pressed="false" data-i18n-text="workspace-molecule">分子轨道 · H₂⁺</button>
+    <button type="button" class="btn ec-export-all" id="ec-export-all" data-i18n-text="workspace-export">导出全部学习记录</button>
+  </nav>
+  <p class="ec-workspace-note" data-i18n-text="workspace-note">从一个原子核到两个原子核，探索概率分布怎样改变。切换实验室会暂停播放，保留两边的测量和答案。</p>
+  <div id="hydrogen-demo" class="ec-guided" data-guide-step="0">
+    <h1 data-i18n-text="t001">电子在哪里？让一次次测量告诉你</h1>
+    <p class="intro" data-i18n-text="t002">不需要先学量子公式。先记录一个位置，再把许多次独立测量放在一起，看电子云怎样显现。</p>
+    <div class="ec-learning-modes" role="group" aria-label="学习方式" data-i18n-aria-label="a012_aria-label">
+      <button type="button" class="btn" id="ec-guided-mode" aria-pressed="true" data-i18n-text="t003">入门引导</button>
+      <button type="button" class="btn" id="ec-explore-mode" aria-pressed="false" data-i18n-text="t004">自由探索 · 元素与轨道</button>
+    </div>
+    <div id="ec-classroom-root" data-i18n-dynamic="true"></div>
+    <section class="ec-guide" id="ec-guide" aria-labelledby="ec-guide-title">
+      <p class="text-small text-muted" data-i18n-text="t005">选择一个入门形状（切换后从 0 次测量开始）</p>
+      <div class="ec-guide-scenes" role="group" aria-label="氢原子的入门形状" data-i18n-aria-label="a017_aria-label">
+        <button type="button" class="btn" data-guide-scene="1s" aria-pressed="true" data-i18n-text="t006">球形云团</button>
+        <button type="button" class="btn" data-guide-scene="2pz" aria-pressed="false" data-i18n-text="t007">上下两个云瓣</button>
+        <button type="button" class="btn" data-guide-scene="3dxy" aria-pressed="false" data-i18n-text="t008">四个云瓣</button>
+      </div>
+      <p class="text-small text-muted" id="ec-guide-context">当前观察氢原子的球形云团。</p>
+      <nav class="ec-guide-steps" aria-label="实验步骤" data-i18n-aria-label="a022_aria-label">
+        <button type="button" class="btn" data-guide-target="0" aria-current="step" data-i18n-text="t010">1 · 测一个位置</button>
+        <button type="button" class="btn" data-guide-target="1" data-i18n-text="t011">2 · 累积成电子云</button>
+        <button type="button" class="btn" data-guide-target="2" data-i18n-text="t012">3 · 看比例怎样稳定</button>
+      </nav>
+      <h2 id="ec-guide-title">第一步：先记录一个位置</h2>
+      <p id="ec-guide-description">每按一次按钮，就把原子重新制备到相同状态，再模拟一次独立的位置测量。</p>
+      <div class="ec-guide-actions">
+        <button type="button" class="btn btn-primary" id="ec-guide-primary">模拟测一次</button>
+        <button type="button" class="btn" id="ec-guide-next" disabled>下一步：累积成云</button>
+      </div>
+      <p class="ec-guide-feedback tabular-nums" id="ec-guide-feedback">还没有测量。先留下第一个点。</p>
+    </section>
+    <p class="ec-simple-note text-small" id="ec-measurement-note">一个点是一条测量记录。点密集的区域，表示在同样大小的空间里更容易发现电子；二维投影也会叠加不同深度的点。</p>
+    <div class="ec-control-grid" data-advanced>
+      <label class="form-label" for="ec-mode" data-i18n-text="t019">模型
+        <select class="form-select" id="ec-mode"><option value="atom" selected data-i18n-text="t020">多电子原子 · 屏蔽近似</option><option value="hydrogen" data-i18n-text="t021">氢原子 · 教材 30 轨道</option></select>
+      </label>
+      <label class="form-label" id="ec-element-field" for="ec-element" data-i18n-text="t022">中性元素 · 原子序数 Z
+        <select class="form-select" id="ec-element"></select>
+      </label>
+      <label class="form-label" id="ec-scope-field" for="ec-scope" data-i18n-text="t023">显示内容
+        <select class="form-select" id="ec-scope"><option value="orbital" data-i18n-text="t024">选定子层的单个空间轨道</option><option value="whole" data-i18n-text="t025">全部已占据轨道 · 角方向平均</option></select>
+      </label>
+    </div>
+    <div id="ec-atom-panel" class="ec-atom-note text-small" data-advanced>
+      <p id="ec-atom-configuration" class="ec-configuration tabular-nums"></p>
+      <p id="ec-atom-source" class="text-muted"></p>
+      <p id="ec-screening-info" class="tabular-nums"></p>
+      <p data-i18n-text="t026">采用有效核电荷类氢近似；适合比较轨道形状、屏蔽与测量统计，不提供精确的多电子波函数、能量或光谱。</p>
+    </div>
+    <div class="ec-control-grid" id="ec-observation-controls">
+      <label class="form-label" id="ec-n-field" for="ec-n" data-advanced hidden data-i18n-text="t027">主量子数 n · 能级
+        <select class="form-select" id="ec-n"><option value="1" data-i18n-text="t028">n = 1 · 1 个轨道</option><option value="2" data-i18n-text="t029">n = 2 · 4 个轨道</option><option value="3" data-i18n-text="t030">n = 3 · 9 个轨道</option><option value="4" data-i18n-text="t031">n = 4 · 16 个轨道</option></select>
+      </label>
+      <label class="form-label" id="ec-family-field" for="ec-family" data-advanced hidden data-i18n-text="t032">轨道类型 · 角量子数 l
+        <select class="form-select" id="ec-family"><option value="s">s · l = 0</option></select>
+      </label>
+      <label class="form-label" id="ec-subshell-field" for="ec-subshell" data-advanced data-i18n-text="t034">已占据子层
+        <select class="form-select" id="ec-subshell"></select>
+      </label>
+      <label class="form-label" id="ec-state-field" for="ec-state" data-advanced data-i18n-text="t035">空间方向 · 实轨道
+        <select class="form-select" id="ec-state"><option value="1s">1s · 球形</option></select>
+      </label>
+      <label class="form-label" for="ec-total" data-i18n-text="t037">测量次数
+        <select class="form-select" id="ec-total"><option value="100" data-i18n-text="t038">100</option><option value="1000" data-i18n-text="t039">1,000</option><option value="10000" selected data-i18n-text="t040">10,000</option><option value="50000" data-i18n-text="t041">50,000</option><option value="100000" data-i18n-text="t042">100,000</option></select>
+      </label>
+      <label class="form-label" for="ec-speed" data-i18n-text="t043">播放速度 · 次/秒
+        <select class="form-select" id="ec-speed"><option value="30" data-i18n-text="t044">30</option><option value="300" data-i18n-text="t045">300</option><option value="1500" selected data-i18n-text="t046">1,500</option><option value="6000" data-i18n-text="t047">6,000</option></select>
+      </label>
+      <label class="form-label" id="ec-radius-field" for="ec-radius" data-i18n-text="t048">观察球大小 · 半径 <span id="ec-radius-value" class="tabular-nums">1.00 a₀</span>
+        <input class="form-range" id="ec-radius" type="range" min="0.5" max="6" step="0.25" value="1">
+      </label>
+    </div>
+    <p id="ec-orbital-info" class="ec-orbital-info text-small tabular-nums" data-advanced></p>
+    <div class="ec-row">
+      <button type="button" class="btn btn-primary" id="ec-play">开始累积</button>
+      <button type="button" class="btn" id="ec-one" data-i18n-text="t051">测量一次</button>
+      <button type="button" class="btn" id="ec-batch" data-i18n-text="t052">增加 100 次</button>
+      <button type="button" class="btn" id="ec-finish">看到最后</button>
+      <button type="button" class="btn" id="ec-new">换一组测量</button>
+      <button type="button" class="btn" id="ec-reveal" aria-pressed="false">揭晓理论概率</button>
+    </div>
+    <p id="ec-status" class="text-small text-muted" aria-live="polite"></p>
+    <div class="ec-view-grid" data-advanced>
+      <label class="form-label" for="ec-view" data-i18n-text="t056">观察视角
+        <select class="form-select" id="ec-view"><option value="rotate" data-i18n-text="t057">三维旋转 · 可拖动点云</option><option value="xz" data-i18n-text="t058">x–z 投影</option><option value="xy" data-i18n-text="t059">x–y 投影</option><option value="yz" data-i18n-text="t060">y–z 投影</option></select>
+      </label>
+      <label class="form-label" for="ec-color" data-i18n-text="t061">点的颜色
+        <select class="form-select" id="ec-color"><option value="phase" data-i18n-text="t062">波函数正负 · 观察节点</option><option value="sphere" data-i18n-text="t063">球内 / 球外 · 观察频率</option><option value="family" data-i18n-text="t064">轨道类型 · s/p/d/f</option></select>
+      </label>
+      <label class="form-label" for="ec-scale" data-i18n-text="t065">坐标范围 · 比较收缩
+        <select class="form-select" id="ec-scale"><option value="auto" data-i18n-text="t066">自动适配</option><option value="0.25" data-i18n-text="t067">固定 ±0.25 a₀</option><option value="1" data-i18n-text="t068">固定 ±1 a₀</option><option value="4" selected data-i18n-text="t069">固定 ±4 a₀</option><option value="12" data-i18n-text="t070">固定 ±12 a₀</option></select>
+      </label>
+      <label class="form-label" for="ec-yaw" data-i18n-text="t071">水平旋转 <span id="ec-yaw-value">35°</span>
+        <input class="form-range" id="ec-yaw" type="range" min="-180" max="180" step="1" value="35">
+      </label>
+      <label class="form-label" for="ec-pitch" data-i18n-text="t073">俯仰角 <span id="ec-pitch-value">20°</span>
+        <input class="form-range" id="ec-pitch" type="range" min="-85" max="85" step="1" value="20">
+      </label>
+    </div>
+    <div class="ec-plots" id="ec-main-plots">
+      <section>
+        <h2 data-i18n-text="t075">把位置记录放在一起</h2>
+        <p class="text-small text-muted" data-i18n-text="t076">每个点是一次新测量，中心十字标出原子核。拖动云图，从不同方向观察。</p>
+        <div class="ec-legend text-small">
+          <span><i class="ec-swatch" style="background:var(--viz-series-1)"></i><span id="ec-legend-first">ψ 为正</span></span>
+          <span><i class="ec-swatch" style="background:var(--viz-series-2)"></i><span id="ec-legend-second">ψ 为负</span></span>
+          <span id="ec-legend-third" hidden><i class="ec-swatch" style="background:var(--viz-series-3)"></i>d</span>
+          <span id="ec-legend-fourth" hidden><i class="ec-swatch" style="background:var(--viz-series-4)"></i>f</span>
+        </div>
+        <div class="ec-cloud" id="ec-cloud">
+          <canvas id="ec-canvas" role="img" aria-label="电子位置测量点在 x–z 平面的投影；每个点是独立测量，核位于原点。">电子位置测量点</canvas>
+          <svg class="ec-chart" id="ec-cloud-axes" role="img" aria-label="x–z 投影，坐标单位为玻尔半径 a₀"></svg>
+        </div>
+        <p id="ec-view-caption" class="ec-caption text-small text-muted"></p>
+        <p class="text-small tabular-nums" id="ec-cloud-info"></p>
+      </section>
+      <section id="ec-convergence-section">
+        <h2 data-i18n-text="t082">落在观察球内的比例会稳定吗？</h2>
+        <p class="text-small text-muted" data-i18n-text="t083">球内次数 ÷ 全部测量次数 = 球内频率。球内按真实的三维距离判断；旋转图形不会改变统计。</p>
+        <div class="ec-legend text-small">
+          <button type="button" class="ec-legend-button cursor-interaction" id="ec-frequency-legend" aria-pressed="true" data-i18n-text="t084"><i class="ec-line-swatch"></i>累计频率</button>
+          <button type="button" class="ec-legend-button cursor-interaction" id="ec-theory-legend" aria-pressed="true" hidden><i class="ec-line-swatch theory"></i>理论概率</button>
+        </div>
+        <svg class="ec-chart" id="ec-convergence" role="img" aria-label="随独立测量次数增加，球内位置的累计频率趋近当前模型的概率" data-i18n-aria-label="a142_aria-label"></svg>
+        <p class="ec-caption tabular-nums" id="ec-frequency-info"></p>
+        <p class="text-small text-muted" id="ec-theory-info">理论概率尚未揭晓</p>
+      </section>
+    </div>
+    <section class="section-space" data-advanced>
+      <h2 id="ec-radial-title">从径向分布看球壳节点</h2>
+      <p id="ec-radial-caption" class="text-small text-muted">三维投影可能掩盖节点。这里把每个点到核的距离单独统计，节点半径处的理论密度为零。</p>
+      <label class="form-label" for="ec-radial-scale" data-i18n-text="t089">半径刻度
+        <select class="form-select" id="ec-radial-scale"><option value="linear" data-i18n-text="t090">线性 · 观察单轨道节点</option><option value="log" data-i18n-text="t091">对数 · 展示内外电子层</option></select>
+      </label>
+      <div class="ec-legend text-small"><span data-i18n-text="t092"><i class="ec-swatch" style="background:var(--viz-series-1)"></i>测量半径直方图</span><span id="ec-radial-legend" hidden><i class="ec-line-swatch theory"></i>理论径向密度</span></div>
+      <svg class="ec-chart" id="ec-radial" role="img" aria-label="独立测量的半径直方图与当前模型的径向概率密度" data-i18n-aria-label="a157_aria-label"></svg>
+      <p id="ec-radial-info" class="text-small tabular-nums"></p>
+    </section>
+    <div class="ec-tooltip text-small tabular-nums" id="ec-tooltip" role="tooltip" hidden></div>
+    <details id="ec-occupancy-details" data-advanced>
+      <summary class="cursor-interaction" data-i18n-text="t094">查看全部已占据子层、电子数与屏蔽计算</summary>
+      <div class="ec-table-wrap"><table class="ec-catalog"><thead><tr><th scope="col" data-i18n-text="t095">子层</th><th scope="col" data-i18n-text="t096">电子数</th><th scope="col" data-i18n-text="t097">占据示意 ↑↓</th><th scope="col" data-i18n-text="t098">Z_eff</th><th scope="col" data-i18n-text="t099">模型平均半径 / a₀</th></tr></thead><tbody id="ec-occupancy"></tbody></table></div>
+      <p class="text-small text-muted" data-i18n-text="t100">方框示意采用先单占、后配对的规则；简并轨道的方向不是唯一微观分配。全原子图按电子数加权、对子层方向平均，因此总密度为球对称。</p>
+    </details>
+    <section class="section-space" id="ec-beginner-help">
+      <h2 data-i18n-text="t101">三个容易混淆的地方</h2>
+      <details><summary class="cursor-interaction" data-i18n-text="t102">云里有这么多点，是不是有这么多电子？</summary><p data-i18n-text="t103">不是。上方三个入门形状都用只有一个电子的氢原子，每次重新制备到同一种状态，再测一次位置。许多个点对应许多次独立实验；两个或四个云瓣也不代表两个或四个电子。多电子原子的图同样记录许多次独立测量，点的总数不等于一个原子的电子数。</p></details>
+      <details><summary class="cursor-interaction" data-i18n-text="t104">“轨道”是不是电子绕核的路线？</summary><p data-i18n-text="t105">这里的轨道用来描述电子的空间量子状态。电子云呈现不同位置的概率分布，画面没有记录一条连续运动路线。</p></details>
+      <details><summary class="cursor-interaction" data-i18n-text="t106">蓝色、橙色和虚线圆怎么理解？</summary><p data-i18n-text="t107">入门的前两步统一用蓝色。第三步中，蓝点在三维观察球内，橙点在球外；虚线圆只是球在屏幕上的投影，所以圆内也可能看见橙点。自由探索中若选择“波函数正负”，两色则表示数学函数的正负号，与电子电荷无关。</p></details>
+      <p class="text-small text-muted" data-i18n-text="t108">坐标用原子尺度单位 a₀，1 a₀ 约为 0.053 纳米。想看元素、节点、量子数或中心极限定理，可切换“自由探索”。</p>
+    </section>
+    <hr class="section-space" data-advanced>
+    <section class="section-space" aria-labelledby="ec-clt-title" data-advanced>
+      <h2 id="ec-clt-title" data-i18n-text="t109">中心极限定理：重复实验的误差</h2>
+      <p class="ec-note" data-i18n-text="t110">把“是否落在球内”记为 0 或 1。每组做 n 次独立测量，重复 1,200 组。左图看频率集中，右图把误差按标准差缩放后与正态曲线比较。</p>
+      <div class="ec-clt-fields">
+        <label class="form-label" for="ec-clt-n" data-i18n-text="t111">每组测量次数 n
+          <select class="form-select" id="ec-clt-n"><option value="5" data-i18n-text="t112">5</option><option value="20" data-i18n-text="t113">20</option><option value="100" selected data-i18n-text="t114">100</option><option value="1000" data-i18n-text="t115">1,000</option></select>
+        </label>
+        <button type="button" class="btn" id="ec-clt-new" data-i18n-text="t116">重新做 1,200 组</button>
+      </div>
+      <p id="ec-clt-info" class="text-small tabular-nums" aria-live="polite"></p>
+      <p id="ec-clt-warning" class="text-small text-muted"></p>
+      <div class="ec-plots" id="ec-clt-plots" hidden>
+        <section>
+          <h3 data-i18n-text="t117">每组的球内频率</h3>
+          <div class="ec-legend text-small"><span data-i18n-text="t118"><i class="ec-line-swatch theory"></i>参考概率</span></div>
+          <svg class="ec-chart" id="ec-clt-raw" role="img" aria-label="1200 组独立实验的球内频率直方图，竖线表示参考概率" data-i18n-aria-label="a205_aria-label"></svg>
+        </section>
+        <section>
+          <h3 data-i18n-text="t119">标准化误差</h3>
+          <div class="ec-legend text-small"><span data-i18n-text="t120"><i class="ec-swatch" style="background:var(--viz-series-1)"></i>重复实验</span><span data-i18n-text="t121"><i class="ec-line-swatch theory"></i>标准正态密度</span></div>
+          <svg class="ec-chart" id="ec-clt-z" role="img" aria-label="标准化误差直方图，与均值 0、方差 1 的正态密度比较" data-i18n-aria-label="a213_aria-label"></svg>
+        </section>
+      </div>
+    </section>
+    <hr class="section-space" data-advanced>
+    <section class="ec-note section-space" data-advanced>
+      <h2 data-i18n-text="t122">课堂里需要分清的模型与测量</h2>
+      <p data-i18n-text="t123">多电子模式中，Slater 屏蔽规则给出 Z_eff = Z − σ，再将氢样轨道按 1/Z_eff 缩放。它保留了节点与角形状，但没有求解电子相关、交换、轨道正交化或相对论效应。所得“模型概率”是这个近似分布的概率。</p>
+      <p data-i18n-text="t124">全原子视图叠加的是密度而不是波函数：f(r) = Σ [N_nl/Z] f_nl(r)。每个点来自一次新的独立制备，随机抽取一个电子的位置；不是连续观察同一原子。未满子层按方向平均，不预设唯一的轨道取向。</p>
+      <p data-i18n-text="t125">量子力学先给出位置概率密度 |ψ|²；大数定律解释多次独立测量的频率为何逼近这个概率；中心极限定理近似描述大量重复实验的频率误差分布。这两项概率论结果不能单独推导出氢原子的波函数。</p>
+      <p data-i18n-text="t126">每个点是一次独立的位置测量，画面中没有电子的运行轨迹。两种相位颜色表示波函数的正负，电子的电荷都相同；实际的位置概率由 |ψ|² 决定。颜色由模型计算，位置测量本身不测得波函数的相位。二维投影会叠加不同深度的点，旋转视角有助于分清各个瓣。</p>
+      <p data-i18n-text="t127">同一个 n、l 下，不同方向的轨道具有相同的径向分布和球内概率。径向节点有 n − l − 1 个，角节点有 l 个，总节点数为 n − 1。</p>
+      <p data-i18n-text="t128">节点是模型中概率密度为零的位置；有限点云里的普通空隙不一定是节点。若想核对节点，应结合方向和径向密度曲线。</p>
+      <details>
+        <summary class="cursor-interaction" data-i18n-text="t129">完整轨道目录：1 + 4 + 9 + 16 = 30</summary>
+        <table class="ec-catalog"><thead><tr><th scope="col" data-i18n-text="t130">能级</th><th scope="col" data-i18n-text="t131">完整轨道组</th></tr></thead><tbody id="ec-catalog"></tbody></table>
+        <p data-i18n-text="t132">这里的 30 个是空间轨道，不计自旋。p_x、p_y 以及 d、f 的实轨道由 m 和 −m 的复球谐函数组合得到；界面中的 |m| 标识所用组合，并不把实轨道误作单个磁量子数的本征态。氢原子还有 n ≥ 5 的更多轨道。</p>
+      </details>
+      <details>
+        <summary class="cursor-interaction" data-i18n-text="t133">查看理论公式与抽样方法</summary>
+        <p data-i18n-text="t134">取 s = r/a₀，a₀ ≈ 0.0529 nm。以下公式先描述非相对论氢原子定态，忽略自旋及核的运动；多电子模式再用有效核电荷缩放。</p>
+        <p class="ec-formula" data-i18n-text="t135,t137,t139,t141,t144">取无量纲半径 s = r/a₀、ρ = 2s/n、k = n − l − 1。归一化径向函数为 R<sub data-i18n-text="t136">nl</sub>(s) = (2/n²)√[k!/(n+l)!] e<sup data-i18n-text="t138">−ρ/2</sup>ρ<sup data-i18n-text="t140">l</sup>L<sub data-i18n-text="t142">k</sub><sup data-i18n-text="t143">2l+1</sup>(ρ)。L 是广义拉盖尔多项式。</p>
+        <p class="ec-formula" data-i18n-text="t145,t147,t149,t152,t154,t156">ψ = a₀<sup data-i18n-text="t146">−3/2</sup>R<sub data-i18n-text="t148">nl</sub>(s)Y<sub data-i18n-text="t150">l</sub><sup data-i18n-text="t151">实</sup>(θ,φ)，其中实球谐函数按球面积分归一化。径向密度 f(s) = s²R<sub data-i18n-text="t153">nl</sub>(s)²，球内概率 p = ∫<sub data-i18n-text="t155">0…R/a₀</sub> f(s) ds，用数值积分计算。</p>
+        <p class="ec-formula" data-i18n-text="t157">平均半径 E[r] = a₀[3n² − l(l+1)]/2。1s 的平均半径是 1.5 a₀，2s 是 6 a₀，2p 是 5 a₀。</p>
+        <p class="ec-formula" data-i18n-text="t158">设每组球内频率为 p̂，则标准差 σ = √[p(1−p)/n]，标准化误差 Z = (p̂−p)/σ。右图的正态近似需 n 足够大，p 也不能过于接近 0 或 1。</p>
+        <p data-i18n-text="t159">径向密度已经计入球壳体积，与每单位体积的位置密度不同：1s 的位置密度在原点最大，径向密度却在 r = a₀ 最大。</p>
+        <p data-i18n-text="t160">无径向节点的状态直接使用 Gamma 分布；其他状态按完整径向密度做拒绝抽样，并用指数包络保留无界尾部。方向从归一化实球谐函数的平方密度抽取。显示窗口外的样本仍参与所有统计。重复实验抽取相同球内概率的伯努利结果。</p>
+        <p data-i18n-text="t161">多电子近似：f_Zeff(s) = Z_eff f_H(Z_eff s)，p(R) = p_H(Z_eff R)，节点与平均半径均除以 Z_eff。全原子密度是按电子数加权的非相干混合；不同轨道不能共用一个“波函数正负”着色。</p>
+        <p data-i18n-text="t162">H–U 的中性组态按照 NIST 参考表，包括常见填充例外。Z = 93–118 在本版本中仅按理想填充顺序生成，不标作实测基态组态。重元素的形状缩放也是粗略教学近似。</p>
+        <p data-i18n-text="t163,t165,t167">屏蔽规则参考： <a href="https://harvest.aps.org/v2/journals/articles/10.1103/PhysRev.36.57/fulltext" target="_blank" rel="noreferrer" data-i18n-text="t164">Slater，Atomic Shielding Constants（1930）</a>；组态参考： <a href="https://math.nist.gov/DFTdata/atomdata/configuration.html" target="_blank" rel="noreferrer" data-i18n-text="t166">NIST：H–U 中性原子参考组态</a>。轨道名称中的多项式用于标识角形状，完整波函数还包含径向部分。</p>
+        <p data-i18n-text="t168,t170,t172,t174">模型参考： <a href="https://dlmf.nist.gov/18.39#E37" target="_blank" rel="noreferrer" data-i18n-text="t169">NIST DLMF：氢原子径向波函数</a>； <a href="https://dlmf.nist.gov/14.30" target="_blank" rel="noreferrer" data-i18n-text="t171">NIST DLMF：球谐函数</a>； <a href="https://www.feynmanlectures.caltech.edu/III_19.html" target="_blank" rel="noreferrer" data-i18n-text="t173">Feynman Lectures III，第 19 章</a>。</p>
+      </details>
+    </section>
+  </div>
+  <div id="molecular-demo" hidden aria-label="分子轨道实验室" data-i18n-aria-label="workspace-molecular-region"></div>
+</main>
+<script src="d3.min.js"></script>
+<script src="electron_model.js"></script>
+<script src="atom_model.js"></script>
+<script src="i18n.js"></script>
+<script src="electron_app.js"></script>
+<script src="lessons.js"></script>
+<script src="classroom.js"></script>
+<script src="molecular_model.js"></script>
+<script src="molecular_app.js"></script>
+<script src="molecular_lessons.js"></script>
+<script src="workspace.js"></script>
+</body>
+</html>

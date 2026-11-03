@@ -1,0 +1,50 @@
+.ec-utilitybar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; margin-bottom:12px; border-bottom:1px solid var(--border); }
+.ec-product-label { font-size:14px; font-weight:600; }
+.ec-language-switch { display:flex; gap:6px; }
+.ec-utilitybar .ec-language-switch .btn[aria-pressed="true"] { background:#175cd3; color:#fff; border-color:#175cd3; }
+#ec-classroom-root { margin:16px 0 20px; }
+.ec-classroom-heading { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; align-items:center; }
+.ec-classroom-heading h2 { margin:0; font-size:20px; }
+.ec-classroom-heading p { margin:5px 0 12px; font-size:14px; color:var(--muted-foreground); }
+.ec-lesson-choices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.ec-lesson-choice { display:block; text-align:left; white-space:normal; padding:12px 14px; min-width:0; width:100%; height:100%; box-sizing:border-box; }
+.ec-lesson-choice strong { display:block; font-size:15px; line-height:1.4; }
+.ec-lesson-choice span { display:block; font-size:12px; line-height:1.5; margin-top:5px; opacity:.85; }
+#ec-classroom-root .ec-lesson-choice[aria-pressed="true"] { border-color:#175cd3; box-shadow:inset 0 0 0 1px #175cd3; background:#175cd3; color:#fff; }
+.ec-task-panel, .ec-teacher-panel { padding:14px 16px; border:1px solid var(--border); border-radius:10px; margin-top:12px; background:var(--background); }
+.ec-task-panel > summary, .ec-teacher-panel > summary { cursor:pointer; font-weight:600; line-height:1.5; }
+.ec-task-panel p, .ec-teacher-panel p { font-size:14px; line-height:1.65; }
+.ec-task-panel fieldset { border:0; padding:0; margin:16px 0; min-width:0; }
+.ec-task-panel legend { font-weight:600; font-size:15px; margin-bottom:8px; }
+.ec-task-options { display:grid; gap:7px; }
+.ec-task-option { display:flex; align-items:flex-start; gap:9px; padding:9px 11px; border:1px solid var(--border); border-radius:6px; line-height:1.5; font-size:14px; cursor:pointer; }
+.ec-task-option input { margin:4px 0 0; flex:none; accent-color:var(--primary); }
+.ec-task-options[aria-disabled="true"] { opacity:.7; }
+.ec-task-actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:12px; }
+.ec-task-progress { padding:10px 12px; background:var(--muted); border-radius:6px; font-size:14px; line-height:1.6; }
+.ec-task-reflection { display:block; width:100%; box-sizing:border-box; resize:vertical; min-height:88px; padding:10px; border:1px solid var(--border); border-radius:6px; background:var(--background); color:var(--foreground); font:inherit; line-height:1.5; }
+.ec-task-reflection-label { display:block; margin:12px 0 6px; font-size:14px; font-weight:600; }
+.ec-task-feedback { margin-top:14px; border-left:3px solid var(--primary); padding:10px 14px; background:var(--muted); line-height:1.6; }
+.ec-task-feedback h3 { margin:0 0 7px; font-size:16px; }
+.ec-task-feedback p { margin:6px 0; }
+.ec-task-feedback ul { padding-left:22px; font-size:14px; }
+.ec-teacher-controls { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:10px; align-items:end; margin:14px 0; }
+.ec-teacher-controls label { min-width:0; }
+.ec-teacher-controls select { width:100%; }
+.ec-teacher-notes ul { padding-left:22px; font-size:14px; line-height:1.65; }
+.ec-classroom-small { font-size:12px !important; color:var(--muted-foreground); }
+.ec-classroom-error { color:var(--destructive, #b42318); font-size:14px; line-height:1.5; }
+.ec-projecting main { max-width:1380px; }
+.ec-projecting .ec-chart text { font-size:15px; }
+.ec-projecting .ec-caption, .ec-projecting .tabular-nums { font-size:16px; }
+.ec-projecting .ec-task-panel p, .ec-projecting .ec-task-option, .ec-projecting .ec-task-reflection-label, .ec-projecting .ec-task-reflection, .ec-projecting .ec-task-feedback ul { font-size:18px; }
+.ec-projecting .ec-task-panel legend, .ec-projecting .ec-task-panel summary, .ec-projecting .ec-teacher-panel summary { font-size:20px; }
+.ec-projecting #ec-classroom-root .btn, .ec-projecting .ec-teacher-panel p, .ec-projecting .ec-teacher-notes ul { font-size:16px; }
+.ec-projecting #ec-beginner-help, .ec-projecting .ec-simple-note { display:none; }
+.ec-projecting .ec-guide { padding:12px 16px; }
+.ec-projecting .ec-guide p { margin-block:7px; }
+.ec-projecting .ec-guide h2 { margin-block:10px 6px; }
+.ec-projecting .ec-guide-scenes { margin-block:6px 10px; }
+@media (max-width:780px) { .ec-lesson-choices { grid-template-columns:1fr; } .ec-lesson-choice { padding:10px 12px; } .ec-lesson-choice span { margin-top:3px; } .ec-teacher-controls { grid-template-columns:1fr; align-items:stretch; } }
+@media (prefers-reduced-motion:reduce) { #ec-classroom-root * { scroll-behavior:auto; } }
+:root { --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif; }

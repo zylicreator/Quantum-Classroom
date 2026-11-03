@@ -1,0 +1,35 @@
+name: Teaching idea / 教学建议
+description: Suggest a classroom activity, clearer explanation, or model extension.
+title: "[Teaching] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share an idea for helping students investigate probability or orbital models.
+        English and Chinese are both welcome.
+  - type: textarea
+    id: audience
+    attributes:
+      label: Students and teaching context / 学生与课堂背景
+      description: What have the students studied, and what concept should they explore?
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Learning question / 想探索的问题
+      description: Describe the question, misconception, or comparison the activity would address.
+    validations:
+      required: true
+  - type: textarea
+    id: activity
+    attributes:
+      label: Proposed activity or change / 活动或改进建议
+      description: Explain what students would predict, change, observe, and discuss.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Model assumptions and references / 模型假设与参考资料
+      description: If the idea adds a physical model, note its approximation and a supporting reference.
