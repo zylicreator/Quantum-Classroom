@@ -7,7 +7,7 @@ case "$image" in
   *) echo 'Use fedora:44, ubuntu:26.04 or ubuntu:24.04.' >&2; exit 2 ;;
 esac
 repo_dir="$(cd "$(dirname "$0")/.." && pwd)"
-report_dir="$repo_dir/artifacts/phase3-linux-${image/:/-}"
+report_dir="$repo_dir/artifacts/phase2-linux-${image/:/-}"
 mkdir -p "$report_dir"
 docker run --rm -i \
   --env "QC_UID=$(id -u)" --env "QC_GID=$(id -g)" \
@@ -38,5 +38,4 @@ cat /etc/os-release > /reports/os-release.txt
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/python -q -ra --junitxml=/reports/tests.xml
 QT_QPA_PLATFORM=offscreen .venv/bin/python scripts/check_desktop.py --output /reports/offscreen
 QT_QPA_PLATFORM=offscreen .venv/bin/python scripts/check_atomic_desktop.py --output /reports/atomic-offscreen
-QT_QPA_PLATFORM=offscreen .venv/bin/python scripts/check_classroom_desktop.py --output /reports/classroom-offscreen
 CONTAINER

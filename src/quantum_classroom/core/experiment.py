@@ -4,7 +4,6 @@ import json
 import os
 from pathlib import Path
 import tempfile
-from uuid import uuid4
 
 import numpy as np
 
@@ -20,7 +19,6 @@ class Experiment:
         _seed(seed)
         self.model = model if model is not None else H2Plus()
         self.seed = int(seed) if not isinstance(seed, str) else seed
-        self.run_id = uuid4().hex
         self.count = self.hits = 0
         self._points = np.empty((self.MAX_COUNT, 3))
         self._hits = np.empty(self.MAX_COUNT, dtype=bool)
@@ -68,7 +66,6 @@ class Experiment:
     def _record(self, metadata, format_name, language):
         return {
             "format": format_name, "schema_version": 1,
-            "run_id": self.run_id,
             "application_version": __version__,
             "created_at": datetime.now(timezone.utc).isoformat(), "language": language,
             "model": metadata,

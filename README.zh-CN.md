@@ -24,7 +24,7 @@
 
 桌面版提供独立的 NumPy 核心和可选 PySide6 原生界面。已迁移氢原子 1s–4f 共 30 个空间轨道、118 个元素的 Slater 屏蔽单轨道及整个原子球对称混合，同时保留 H₂⁺ 实验。Z=93–118 明确标为理想填充示意，不代表实测基态。切换实验室会暂停测量并保留两边的实验。
 
-两个实验室均支持无截断抽样、全部测量统计、旋转／投影、频率及径向／轴向曲线、中英文与 JSON 导出。第三阶段已加入 5 个双语任务、7 个教师预设、成组重复实验、投影大字模式和完整课堂记录保存／恢复。教师载入不代替学生提交预测，自由解释不自动评分。详见[第三阶段验证记录](docs/PHASE3_VALIDATION.md)与[记录格式](docs/CLASSROOM_RECORDS.md)。
+两个实验室均支持无截断抽样、全部测量统计、旋转／投影、频率及径向／轴向曲线、中英文与 JSON 导出。完整课堂任务、教师预设等工具暂保留在网页版，后续再迁移。详见[第二阶段验证记录](docs/PHASE2_VALIDATION.md)。
 
 先按[中文安装说明](docs/LINUX_PYTHON.zh-CN.md)或 [English guide](docs/LINUX_PYTHON.md)安装 Linux 系统依赖，然后运行：
 
@@ -39,7 +39,7 @@ python3 -m venv .venv
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/python -q
 ```
 
-实际验证范围与后续工作见[第三阶段验证记录](docs/PHASE3_VALIDATION.md)；第[一](docs/PHASE1_VALIDATION.md)、[二](docs/PHASE2_VALIDATION.md)阶段记录保留为历史说明。
+实际验证范围与后续工作见[第二阶段验证记录](docs/PHASE2_VALIDATION.md)；[第一阶段记录](docs/PHASE1_VALIDATION.md)保留为历史说明。
 
 ### 现有网页版
 
@@ -60,7 +60,7 @@ QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/python -q
 
 每个点来自独立制备的同一选定状态的一次位置测量。它们不是电子运动轨迹，也不表示许多电子同时存在。任务中的最低观察次数只是教学门槛，不是保证准确收敛的数学阈值。
 
-网页版的实验和答案保存在页面内存中，刷新或关闭前请导出记录。目前不提供 JSON 导入或进度恢复。软件没有后端；只有主动点击参考资料链接时才会打开外部网站。
+本次实验和答案保存在页面内存中，刷新或关闭前请导出记录。目前不提供 JSON 导入或进度恢复。软件没有后端；只有主动点击参考资料链接时才会打开外部网站。
 
 ## 理解模型的边界
 

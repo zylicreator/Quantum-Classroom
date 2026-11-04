@@ -21,16 +21,6 @@ class SamplingWindow(QMainWindow):
     BATCH = 512
     record_filename = 'h2plus-classroom-record.json'
 
-    def set_revealed(self, value):
-        self.revealed = bool(value)
-        self.frequency_plot.show_probability = self.revealed
-        self.reveal_button.setVisible(not self.revealed)
-        self._dirty = True
-        self.update_controls()
-
-    def reveal_probability(self):
-        self.set_revealed(True)
-
     def initialize_worker(self):
         self.thread = QThread(self)
         self.worker = SamplingWorker()

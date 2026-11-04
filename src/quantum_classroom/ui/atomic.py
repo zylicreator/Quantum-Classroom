@@ -35,7 +35,7 @@ class AtomicCloud(Cloud):
         points = self.experiment.display_points()
         if len(points):
             projected = self.project(points)*[scale, -scale]+center
-            positive = model.in_region(points) if getattr(self, 'sphere_colors', False) else np.ones(len(points), dtype=bool) if model.mixed or not self.sign_colors else model.amplitude(points) >= 0
+            positive = np.ones(len(points), dtype=bool) if model.mixed or not self.sign_colors else model.amplitude(points) >= 0
             for mask, color in [(positive, TEAL), (~positive, ORANGE)]:
                 color = QColor(color)
                 color.setAlpha(140)
@@ -132,9 +132,6 @@ class AtomicLaboratory(SamplingWindow):
         self.status.setWordWrap(True)
         self.status.setObjectName('muted')
         controls.addWidget(self.status)
-        self.revealed = True
-        self.reveal_button = self.button('揭晓模型概率', 'Reveal model probability', self.reveal_probability)
-        controls.addWidget(self.reveal_button)
         self.export_button = self.button('导出全部测量 JSON', 'Export measurements (JSON)', self.choose_export)
         controls.addWidget(self.export_button)
         controls.addWidget(self.label('模型、元素、轨道或种子改变会清空测量；观察球半径改变只重新统计。',
@@ -154,7 +151,7 @@ class AtomicLaboratory(SamplingWindow):
         self.view = QComboBox()
         self.view.addItems(['', '', ''])
         self.colors = QComboBox()
-        self.colors.addItems(['', '', ''])
+        self.colors.addItems(['', ''])
         options.addWidget(self.view, 1)
         options.addWidget(self.colors, 1)
         right.addLayout(options)
@@ -229,8 +226,7 @@ class AtomicLaboratory(SamplingWindow):
         for plot in [self.cloud, self.frequency_plot, self.axis_plot]:
             plot.experiment = self.experiment
         self._dirty = True
-        self.update_view()
-        self.set_revealed(True)
+        self.update_controls()
 
     def radius_changed(self, radius):
         self.experiment.set_radius(radius)
@@ -240,9 +236,7 @@ class AtomicLaboratory(SamplingWindow):
     def update_view(self, *_):
         self.cloud.view = ['3d', 'xz', 'xy'][self.view.currentIndex()]
         self.cloud.sign_colors = self.colors.currentIndex() == 0 and not self.experiment.model.mixed
-        self.cloud.sphere_colors = self.colors.currentIndex() == 2
         self._dirty = True
-        self.update_controls()
 
     def toggle_language(self):
         self.language = 'en' if self.language == 'zh' else 'zh'
@@ -257,7 +251,7 @@ class AtomicLaboratory(SamplingWindow):
         for combo, chinese, english in [
             (self.mode, ['氢原子', '多电子 · 单个占据轨道', '多电子 · 整个原子混合'], ['Hydrogen', 'Screened · occupied orbital', 'Screened · whole-atom mixture']),
             (self.view, ['三维 · 拖动旋转', '侧视投影 xz', '端视投影 xy'], ['3D · drag to rotate', 'Side projection xz', 'End projection xy']),
-            (self.colors, ['波函数符号', '统一颜色', '观察球内 / 外'], ['Wavefunction sign', 'Uniform color', 'Inside / outside sphere'])]:
+            (self.colors, ['波函数符号', '统一颜色'], ['Wavefunction sign', 'Uniform color'])]:
             for i, text in enumerate(chinese if zh else english):
                 combo.setItemText(i, text)
         for plot in [self.cloud, self.frequency_plot, self.axis_plot]:
@@ -276,8 +270,7 @@ class AtomicLaboratory(SamplingWindow):
         self.run.setText(('暂停' if zh else 'Pause') if active else ('开始测量' if zh else 'Start'))
         self.target.setEnabled(not active)
         frequency = '—' if exp.frequency is None else f'{exp.frequency:.3%}'
-        probability = f'{m.region_probability:.3%}' if self.revealed else ('待揭晓' if zh else 'hidden')
-        self.stats.setText((f'测量次数  {exp.count:,}\n球内命中  {exp.hits:,}\n测量频率  {frequency}\n模型概率  {probability}') if zh else (f'Measurements  {exp.count:,}\nSphere hits  {exp.hits:,}\nFrequency  {frequency}\nModel probability  {probability}'))
+        self.stats.setText((f'测量次数  {exp.count:,}\n球内命中  {exp.hits:,}\n测量频率  {frequency}\n模型概率  {m.region_probability:.3%}') if zh else (f'Measurements  {exp.count:,}\nSphere hits  {exp.hits:,}\nFrequency  {frequency}\nModel probability  {m.region_probability:.3%}'))
         self.status.setText(('正在测量…' if zh else 'Measuring…') if self._remaining else ('正在完成当前批次…' if zh else 'Finishing current batch…') if self._busy else ('已暂停 / 等待测量' if zh else 'Paused / ready'))
         self.display_note.setText((f'点云选取 {min(exp.count, 50000):,} / {exp.count:,} 点；窗口外的测量仍计入统计。' if zh else f'Cloud selects {min(exp.count, 50000):,} / {exp.count:,} measurements; off-screen points still count.'))
         if m.mode == 'hydrogen':
@@ -294,5 +287,3 @@ class AtomicLaboratory(SamplingWindow):
         ) if zh else ((
             'Whole-atom view is an electron-weighted angularly averaged incoherent mixture, with no common phase. Each point measures a randomly selected electron from a new atom.' if m.mixed else 'Teal ψ≥0, orange ψ<0; radial density includes the r² shell factor.'
         ) + (' Slater screening is a teaching approximation, not a self-consistent electronic-structure calculation.' if m.mode != 'hydrogen' else '')))
-        if self.colors.currentIndex() == 2:
-            self.interpretation.setText('青色：观察球内；橙色：观察球外。此配色只标记位置区域。' if zh else 'Teal: inside the observation sphere; orange: outside. These colors label position regions only.')

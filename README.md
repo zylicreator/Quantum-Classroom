@@ -27,15 +27,12 @@ PySide6 interface. It now includes all 30 hydrogen spatial orbitals (1s–4f),
 Slater-screened orbitals and spherical whole-atom mixtures for 118 elements, plus
 the existing H₂⁺ laboratory. Z=93–118 are explicitly ideal-filling illustrations,
 not observed ground states. Switching laboratories pauses playback and preserves
-both experiments. Phase 3 adds five bilingual activities, seven teacher scenarios,
-repeated-group experiments, large-text mode and complete classroom save/restore.
+both experiments. Full classroom activities and teacher presets remain in the web
+edition pending a later migration stage.
 
 Both workspaces support unbounded seeded sampling, all-measurement statistics,
 rotation/projections, frequency and radial/axial curves, Chinese/English and
-JSON exports. Predictions, explanations and the latest 30 checks per task survive
-language changes and session restoration. Teacher loading does not submit a
-student prediction; written explanations are never automatically graded.
-See [phase 3 results](docs/PHASE3_VALIDATION.md) and [record format](docs/CLASSROOM_RECORDS.md).
+JSON exports. See [phase 2 results](docs/PHASE2_VALIDATION.md).
 
 After installing the Linux system dependencies in the
 [English installation guide](docs/LINUX_PYTHON.md) or
@@ -52,7 +49,7 @@ python3 -m venv .venv
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/python -q
 ```
 
-See [verification results and remaining work](docs/PHASE3_VALIDATION.md); phases [1](docs/PHASE1_VALIDATION.md) and [2](docs/PHASE2_VALIDATION.md) remain historical records.
+See [verification results and remaining work](docs/PHASE2_VALIDATION.md); [phase 1](docs/PHASE1_VALIDATION.md) is retained as history.
 
 ### Existing web edition
 
@@ -73,7 +70,7 @@ Both laboratories support rotation and projections, Chinese and English, and up 
 
 Each dot represents a position measurement on a newly prepared system in the same selected state. Dots are **neither an electron trajectory nor many electrons present at once**. A task's minimum observation count is a teaching guideline, not a threshold that guarantees exact convergence.
 
-In the web edition, experiment data and answers are kept in page memory. Export records before refreshing or closing the page. JSON import and progress restoration are not implemented. Reference links open external websites only when selected; the app has no backend.
+Experiment data and answers are kept in page memory. Export records before refreshing or closing the page. JSON import and progress restoration are not implemented. Reference links open external websites only when selected; the app has no backend.
 
 ## What the models mean
 

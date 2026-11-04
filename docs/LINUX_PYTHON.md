@@ -1,10 +1,10 @@
 # Python atomic and H₂⁺ laboratories on Linux
 
-[中文](LINUX_PYTHON.zh-CN.md) · [Results](PHASE3_VALIDATION.md) · [Model definitions](MODELS.md)
+[中文](LINUX_PYTHON.zh-CN.md) · [Results](PHASE2_VALIDATION.md) · [Model definitions](MODELS.md)
 
-Phase 3 adds five bilingual activities, seven teacher scenarios, repeated-group
-experiments and complete classroom save/restore. All 30 hydrogen orbitals,
-118 screened elements and H₂⁺ remain available. The original web edition is preserved.
+Phase 2 adds the 30 classroom hydrogen orbitals and all 118 screened neutral
+atoms to the preserved H₂⁺ workspace. Full classroom activities and teacher
+presets remain later work. The original offline web edition is preserved.
 
 ## Environment and installation
 
@@ -55,44 +55,6 @@ if explicit platform selection is needed; for X11/XWayland use `xcb` with a vali
 `DISPLAY`. Offscreen mode tests widgets but does not validate the desktop session.
 Only the real Wayland session listed in the results has been exercised here.
 
-## Activities, teacher scenarios and restoring records
-
-The Classroom activities tab contains Learning activities, Teacher scenarios and
-Repeated groups. Select an activity, choose a prediction, and record it before
-starting the fresh scenario. Predictions lock for that run. Observe at least the
-activity's stated count; the frequency activity also requires revealing model
-probability. Return to the task, choose a conclusion and explain it. Only the
-choice is checked against the model; written explanations are never graded.
-The latest 30 checks per activity are retained, including their observation context.
-
-All seven teacher scenarios start at zero measurements, including the web's
-previously prefilled nodes/CLT examples. Loading clears only the selected
-experiment, preserves drafts/history and the other experiment, and never submits
-a student's prediction. Large text supports classroom projection. Language
-changes preserve experiments, answers and hidden/revealed probability.
-
-Repeated groups draw independent Binomial(n,p) region-event counts using the
-current atomic sphere probability; they do not add position points. The two
-histograms compare frequencies and standardized errors with normal approximations.
-Zero-variance p=0/1 cases are not standardized. Small n·p or n·(1−p) triggers a
-caution; the heuristic is not a mathematical guarantee of approximation accuracy.
-
-Save classroom record pauses sampling, finishes any pending bounded batch, and
-atomically saves both experiments, all coordinates, answers, 30-check histories,
-views, language, probability reveal state, large text and repeated-group results.
-Restore record validates the complete file in a worker thread before replacing
-live state. Restored experiments stay paused and continue the exact seeded prefix.
-Phase 1/2 individual Python measurement records are also supported; only their
-own workspace is replaced. The web record formats are not imported.
-
-Files are limited to 64 MiB and desktop-supported models/controls/integer seeds.
-Unknown versions, invalid coordinates and incompatible seeded replay are rejected
-without replacing current experiments. If replay differs, use the original NumPy
-and application versions recorded in the file. Core string seeds and hydrogen
-states outside the 30 classroom orbitals are not supported by desktop restoration.
-There is no automatic save, upload or authenticated grading. Save before closing.
-See the [record format and headless API](CLASSROOM_RECORDS.md).
-
 ## Atomic workspace
 
 Choose Hydrogen (30 spatial orbitals, n<=4), Screened occupied orbital, or Screened
@@ -133,10 +95,9 @@ experiment.export("atomic-classroom-record.json", language="en")
 3. Drag the 3D view to rotate, or choose xz/xy projection. Switch uniform/sign
    colors or density/amplitude curves without changing measurements.
 4. Change language at any time. Export JSON to save every measurement and its
-   parameters, RNG information and statistics. Records remain local. The top-level
-   Save classroom record includes both experiments, views and activity answers;
-   Restore record imports complete sessions or individual measurement records.
-   Save before closing; there is no automatic save.
+   parameters, RNG information and statistics. Records remain local. Import and
+   session restoration are not implemented; reset/parameter changes and closing
+   the window discard unsaved measurements.
 
 Changing R, orbital or seed starts a new experiment. Old worker results are
 rejected by experiment generation number. All 100000 allowed measurements enter
@@ -175,8 +136,7 @@ are unavailable. Core calculations never require Qt, SciPy or Node.
 probability and nodes. `AtomicModel` adds screened mixtures and observation
 regions. `AtomicSampler` preserves arbitrary chunk prefixes. Whole-atom records
 include the approximation, configuration status and every channel's occupancy,
-shielding and effective charge. The desktop can restore these measurements;
-complete classroom sessions additionally preserve answers and views.
+shielding and effective charge. Import/restoration remains unimplemented.
 
 ## Headless and reusable H₂⁺ core
 
@@ -219,10 +179,9 @@ deterministic calculations and statistical properties, not individual samples.
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/python -q
 QT_QPA_PLATFORM=offscreen .venv/bin/python scripts/check_desktop.py
 QT_QPA_PLATFORM=offscreen .venv/bin/python scripts/check_atomic_desktop.py
-QT_QPA_PLATFORM=offscreen .venv/bin/python scripts/check_classroom_desktop.py
 
 # A real local desktop; opens test windows
-.venv/bin/python scripts/check_classroom_desktop.py --require-display --output artifacts/phase3-wayland
+.venv/bin/python scripts/check_atomic_desktop.py --require-display --output artifacts/phase2-desktop
 
 # Requires a working Docker engine; sources mounted read-only
 bash scripts/test_linux_container.sh fedora:44

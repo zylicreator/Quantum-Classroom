@@ -120,7 +120,6 @@ class Plot(QWidget):
         self.mode = mode
         self.experiment = None
         self.language = "zh"
-        self.show_probability = True
         self.setMinimumSize(315, 220)
 
     def paintEvent(self, event):
@@ -135,15 +134,12 @@ class Plot(QWidget):
             n, frequency = exp.convergence()
             xmax = math.log10(max(10, exp.count))
             xmin, ymin, ymax = 0, 0, 1
-            curves = [(np.log10(n), frequency, TEAL, False)]
-            if self.show_probability:
-                curves.append((np.array([0, xmax]), np.repeat(exp.model.region_probability, 2), ORANGE, True))
+            curves = [(np.log10(n), frequency, TEAL, False),
+                      (np.array([0, xmax]), np.repeat(exp.model.region_probability, 2), ORANGE, True)]
             atomic = hasattr(exp.model, 'mode')
             title = ("观察球：频率与概率" if zh else "Sphere: frequency & probability") if atomic else ("中央薄片：频率与概率" if zh else "Central slab: frequency & probability")
             footer = "n（对数刻度） · 误差不必逐步减小" if zh else "n (log scale) · error need not fall at every step"
             legend = "青：频率   橙虚线：模型概率" if zh else "Teal: frequency   Orange dashed: model probability"
-            if not self.show_probability:
-                legend = "青：频率；模型概率待揭晓" if zh else "Teal: frequency; model probability hidden"
             ticks = [(i, str(10**i)) for i in range(int(xmax)+1)]
         elif self.mode == 'radial':
             x = np.linspace(0, exp.model.extent, 401)

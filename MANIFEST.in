@@ -4,5 +4,3 @@ include docs/PHASE1_VALIDATION.md constraints-linux-tested.txt
 include scripts/check_desktop.py scripts/test_linux_container.sh
 include scripts/check_atomic_desktop.py
 include docs/PHASE2_VALIDATION.md
-include docs/PHASE3_VALIDATION.md docs/CLASSROOM_RECORDS.md
-include scripts/check_classroom_desktop.py

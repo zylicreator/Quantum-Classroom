@@ -164,21 +164,3 @@ statistical tolerances, display limits and current validation scope.
 Choice answers can be checked against the stated model explanation. Free-written explanations are not automatically graded. Activity observation minima are practical teaching requirements, not mathematical convergence guarantees.
 
 Current answers and experiment data live in page memory. JSON export saves a local record; it does not upload the record, and there is currently no import or restoration feature. Teaching activities and numerical checks are not evidence of measured classroom learning gains.
-
-## Python classroom activities and records (phase 3)
-
-The native edition now includes five bilingual tasks and seven teacher presets,
-plus complete local save/restore; see the [record contract](CLASSROOM_RECORDS.md).
-Teacher loading resets only the chosen experiment and never submits a student
-prediction. A recorded prediction is tied to a unique experiment run, so resetting
-with the same seed cannot reuse an earlier observation. Changing language keeps
-answers and the probability reveal state. Free explanations remain ungraded.
-
-For grouped region events, the selected quantum model supplies p first. The core
-draws independent K_j ~ Binomial(n,p), with f_j=K_j/n,
-E[f_j]=p and Var(f_j)=p(1-p)/n. These are equivalent region hit counts, not newly
-generated xyz measurements, and do not change the position experiment. The
-standardized error is (f_j-p)/sqrt(p(1-p)/n), undefined for p=0 or 1.
-The normal overlay is an approximation; a warning when min(np,n(1-p))<10 is a
-conservative teaching heuristic, not a bound on approximation error. Finite
-histograms need not be smooth. Neither LLN nor CLT supplies a wavefunction.

@@ -44,5 +44,5 @@ jobs:
       - run: |
           python -m venv .venv
           .venv/bin/python -m pip install '.[test,science-test]' build
-          .venv/bin/python -m pytest tests/python/test_core.py tests/python/test_atoms.py tests/python/test_activities.py tests/python/test_records.py -q
+          .venv/bin/python -m pytest tests/python/test_core.py tests/python/test_atoms.py -q
           .venv/bin/python -m build

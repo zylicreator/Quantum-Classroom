@@ -92,9 +92,6 @@ class Laboratory(SamplingWindow):
         self.status.setObjectName("muted")
         self.status.setWordWrap(True)
         controls.addWidget(self.status)
-        self.revealed = True
-        self.reveal_button = self.button("揭晓模型概率", "Reveal model probability", self.reveal_probability)
-        controls.addWidget(self.reveal_button)
         self.export_button = self.button("导出全部测量 JSON", "Export all measurements (JSON)", self.choose_export)
         controls.addWidget(self.export_button)
         controls.addStretch()
@@ -176,7 +173,7 @@ class Laboratory(SamplingWindow):
         for plot in [self.cloud, self.frequency_plot, self.axis_plot]:
             plot.language = self.language
         self._dirty = True
-        self.set_revealed(self.revealed)
+        self.update_controls()
 
     def reset_experiment(self, *_):
         self.epoch += 1
@@ -187,7 +184,7 @@ class Laboratory(SamplingWindow):
         for plot in [self.cloud, self.frequency_plot, self.axis_plot]:
             plot.experiment = self.experiment
         self._dirty = True
-        self.set_revealed(True)
+        self.update_controls()
 
 
     def update_view(self, *_):
@@ -208,12 +205,11 @@ class Laboratory(SamplingWindow):
         self.run.setText(("暂停" if zh else "Pause") if active else ("开始测量" if zh else "Start"))
         self.target.setEnabled(not active)
         frequency = "—" if exp.frequency is None else f"{exp.frequency:.3%}"
-        probability = f"{exp.model.region_probability:.3%}" if self.revealed else ("待揭晓" if zh else "hidden")
         if zh:
-            self.stats.setText(f"测量次数  {exp.count:,}\n薄片命中  {exp.hits:,}\n测量频率  {frequency}\n模型概率  {probability}")
+            self.stats.setText(f"测量次数  {exp.count:,}\n薄片命中  {exp.hits:,}\n测量频率  {frequency}\n模型概率  {exp.model.region_probability:.3%}")
             self.status.setText("正在测量…" if self._remaining else ("正在完成当前批次…" if self._busy else "已暂停 / 等待测量"))
             self.display_note.setText(f"点云选取 {min(exp.count, Experiment.DISPLAY_LIMIT):,} / {exp.count:,} 个测量点；全部测量均计入统计，含显示窗口外的点。")
         else:
-            self.stats.setText(f"Measurements  {exp.count:,}\nSlab hits  {exp.hits:,}\nFrequency  {frequency}\nModel probability  {probability}")
+            self.stats.setText(f"Measurements  {exp.count:,}\nSlab hits  {exp.hits:,}\nFrequency  {frequency}\nModel probability  {exp.model.region_probability:.3%}")
             self.status.setText("Measuring…" if self._remaining else ("Finishing current batch…" if self._busy else "Paused / ready"))
             self.display_note.setText(f"Cloud selects {min(exp.count, Experiment.DISPLAY_LIMIT):,} / {exp.count:,} measurements. All measurements count in statistics, including off-screen points.")
