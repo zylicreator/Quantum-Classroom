@@ -6,7 +6,7 @@
 
 One measurement gives a point. Repeated independent measurements reveal a distribution.
 
-Quantum Classroom currently includes Electron Cloud Classroom, a bilingual teaching tool built with AI assistance. Students can predict, simulate position measurements, compare observed frequencies with model probabilities, and explain what they see. It runs entirely in the browser and works offline.
+Quantum Classroom includes Electron Cloud Classroom, a bilingual teaching tool built with AI assistance, and native Python atomic and H₂⁺ laboratories. Students can predict, simulate position measurements, compare observed frequencies with model probabilities, and explain what they see. The existing web edition runs entirely in the browser and works offline.
 
 ![H₂⁺ molecular orbital experiment, showing a simulated antibonding cloud and its central observation slab](docs/images/molecular-orbitals.png)
 
@@ -19,6 +19,42 @@ Quantum Classroom currently includes Electron Cloud Classroom, a bilingual teach
 No installation, account, local server, or internet connection is needed to use the app. `electron-cloud-classroom.html` is the same standalone application under a descriptive filename. Opening an HTML file on GitHub displays its source; download it to run it locally.
 
 ## What you can explore
+
+### Python desktop preview · atoms and H₂⁺
+
+The desktop edition provides a GUI-independent NumPy core and an optional native
+PySide6 interface. It now includes all 30 hydrogen spatial orbitals (1s–4f),
+Slater-screened orbitals and spherical whole-atom mixtures for 118 elements, plus
+the existing H₂⁺ laboratory. Z=93–118 are explicitly ideal-filling illustrations,
+not observed ground states. Switching laboratories pauses playback and preserves
+both experiments. Phase 3 adds five bilingual activities, seven teacher scenarios,
+repeated-group experiments, large-text mode and complete classroom save/restore.
+
+Both workspaces support unbounded seeded sampling, all-measurement statistics,
+rotation/projections, frequency and radial/axial curves, Chinese/English and
+JSON exports. Predictions, explanations and the latest 30 checks per task survive
+language changes and session restoration. Teacher loading does not submit a
+student prediction; written explanations are never automatically graded.
+See [phase 3 results](docs/PHASE3_VALIDATION.md) and [record format](docs/CLASSROOM_RECORDS.md).
+
+After installing the Linux system dependencies in the
+[English installation guide](docs/LINUX_PYTHON.md) or
+[中文安装说明](docs/LINUX_PYTHON.zh-CN.md):
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[desktop,test,gui-test,science-test]'
+.venv/bin/quantum-classroom
+
+# No display required:
+.venv/bin/quantum-classroom-verify
+.venv/bin/quantum-classroom-verify-atoms
+QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/python -q
+```
+
+See [verification results and remaining work](docs/PHASE3_VALIDATION.md); phases [1](docs/PHASE1_VALIDATION.md) and [2](docs/PHASE2_VALIDATION.md) remain historical records.
+
+### Existing web edition
 
 | Laboratory | Models and activities |
 | --- | --- |
@@ -37,7 +73,7 @@ Both laboratories support rotation and projections, Chinese and English, and up 
 
 Each dot represents a position measurement on a newly prepared system in the same selected state. Dots are **neither an electron trajectory nor many electrons present at once**. A task's minimum observation count is a teaching guideline, not a threshold that guarantees exact convergence.
 
-Experiment data and answers are kept in page memory. Export records before refreshing or closing the page. JSON import and progress restoration are not implemented. Reference links open external websites only when selected; the app has no backend.
+In the web edition, experiment data and answers are kept in page memory. Export records before refreshing or closing the page. JSON import and progress restoration are not implemented. Reference links open external websites only when selected; the app has no backend.
 
 ## What the models mean
 

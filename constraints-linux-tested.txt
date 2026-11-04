@@ -1,0 +1,8 @@
+# Versions validated on x86_64 Linux with Python 3.12 and 3.14 (2026-11-03).
+# Optional constraints, not a full transitive lockfile. NumPy here needs Python >=3.12.
+numpy==2.5.4
+PySide6-Essentials==6.12.0
+shiboken6==6.12.0
+pytest==9.2.0
+pytest-qt==4.5.0
+scipy==1.18.1

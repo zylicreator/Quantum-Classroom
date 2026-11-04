@@ -99,8 +99,86 @@ The numerical tests check normalization, overlap, symmetries, nodes, sample freq
 
 Both laboratories include all measurements in their statistics, up to 100,000. The cloud selects at most 50,000 measurement indices for display; clipping and projection do not remove samples from the statistics.
 
-## Classroom records
+## Python atomic implementation (phase 2)
+
+The Python core preserves the web orbital IDs, real-harmonic sign convention,
+Slater rules and neutral configurations. `HydrogenOrbital` implements the finite
+Laguerre polynomial and associated Legendre recurrence using NumPy. The 30
+hydrogen classroom states have n<=4; internal n<=7 s/p/d/f states support the
+screened model. SciPy is used only as an independent verification reference.
+
+For radial-node states, rejection uses constant envelopes on scaled-radius
+intervals of width 0.125, evaluated at endpoints and polynomial critical points.
+The tail starts at T=max(40,8n+16) in rho=2 Z_eff r/n and has an exponential
+envelope with rate 1-(2n)/T. Bounding Laguerre coefficients by their absolute
+values makes this envelope extend to infinity. States without radial nodes use
+an exact Gamma proposal. Uniform spherical angular rejection is bounded by the
+real-harmonic addition theorem. Independent fixed-block streams preserve sample
+prefixes across arbitrary chunk sizes. Sampling never uses the drawing extent.
+
+Sphere probabilities use 32-point Gauss-Legendre integration on panels no wider
+than one scaled-radius unit. As in the web engine, the CDF integral ends at
+rho=160 when a larger radius is requested; the omitted tail is negligible at the
+documented 2e-11 verification tolerance. This numerical CDF bound is not a
+sampling cutoff. Independent quadrature also checks normalization and moments
+over an infinite radial interval.
+
+Whole-atom sampling chooses a subshell with probability electrons/Z, then samples
+its screened radius and a uniform direction. This directly implements the web
+model's complete-angular-basis average, including open subshells; it is not an
+oriented many-electron wavefunction. Its density is the weighted radial-amplitude
+square divided by 4pi, including a finite evaluation at the origin. There is no
+common amplitude or phase, and the desktop disables sign colors in this mode.
+
+The independent offline NIST test fixture contains expanded neutral occupancies
+for H–U from the [reference table](https://math.nist.gov/DFTdata/atomdata/configuration.html),
+retrieved 2026-11-03. Only factual occupancies are recorded. Z=93–118 continue to
+use ideal filling, never an observed-ground-state label.
+
+## Python H₂⁺ implementation (phase 1, preserved)
+
+`src/quantum_classroom/core/molecular.py` implements the same fixed-nuclei 1s LCAO
+model, R range and infinite transverse slab as the web engine. Near the node it
+uses `rA-rB = 2Rz/(rA+rB)` and `expm1` to avoid subtracting nearly equal
+exponentials. Slab probability uses the existing prolate-coordinate reduction
+with a 128-node Gauss-Legendre residual integral, checked by independent direct
+cylindrical integration. The residual beyond u=40 contributes less than 1e-18
+within the supported R interval; sampling itself has no finite spatial boundary.
+
+The proposal is the equal-weight mixture of two 1s densities. Radii follow
+Gamma(shape=3, rate=2), directions are isotropic, and rejection gives the selected
+normalized molecular density. NumPy PCG64 proposals are generated in fixed blocks
+of 4096; accepted leftovers are retained across `take` calls. The reported
+acceptance count includes that buffer, while measurement counts include only
+delivered samples. Python and JavaScript RNGs intentionally differ. Fixed-seed
+tests compare within-language prefixes; cross-language checks compare amplitudes,
+overlap, slab probability and axis curves, while statistical tests compare to the
+same model integrals and moments.
+
+`quantum-classroom-verify` checks numerical normalization and sampling without Qt,
+Node or a display. See [Linux/Python documentation](LINUX_PYTHON.md) for commands,
+statistical tolerances, display limits and current validation scope.
+
+## Classroom records (web edition)
 
 Choice answers can be checked against the stated model explanation. Free-written explanations are not automatically graded. Activity observation minima are practical teaching requirements, not mathematical convergence guarantees.
 
 Current answers and experiment data live in page memory. JSON export saves a local record; it does not upload the record, and there is currently no import or restoration feature. Teaching activities and numerical checks are not evidence of measured classroom learning gains.
+
+## Python classroom activities and records (phase 3)
+
+The native edition now includes five bilingual tasks and seven teacher presets,
+plus complete local save/restore; see the [record contract](CLASSROOM_RECORDS.md).
+Teacher loading resets only the chosen experiment and never submits a student
+prediction. A recorded prediction is tied to a unique experiment run, so resetting
+with the same seed cannot reuse an earlier observation. Changing language keeps
+answers and the probability reveal state. Free explanations remain ungraded.
+
+For grouped region events, the selected quantum model supplies p first. The core
+draws independent K_j ~ Binomial(n,p), with f_j=K_j/n,
+E[f_j]=p and Var(f_j)=p(1-p)/n. These are equivalent region hit counts, not newly
+generated xyz measurements, and do not change the position experiment. The
+standardized error is (f_j-p)/sqrt(p(1-p)/n), undefined for p=0 or 1.
+The normal overlay is an approximation; a warning when min(np,n(1-p))<10 is a
+conservative teaching heuristic, not a bound on approximation error. Finite
+histograms need not be smooth. Neither LLN nor CLT supplies a wavefunction.

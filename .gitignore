@@ -243,3 +243,6 @@ Thumbs.db
 *classroom-record*.json
 electron-cloud-atoms-molecules-record.json
 *.zip
+
+# Complete native classroom sessions may contain student explanations.
+*classroom-session*.json

@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quantum-classroom"
+version = "0.4.0a1"
+description = "Independent atomic and H2+ measurements for probability and quantum teaching"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+dependencies = ["numpy>=2.3,<3"]
+
+[project.optional-dependencies]
+# Essentials supplies PySide6.QtCore, QtGui and QtWidgets without the add-on modules.
+desktop = ["PySide6-Essentials>=6.10,<7"]
+test = ["pytest>=8,<10"]
+gui-test = ["pytest-qt>=4.4,<5"]
+science-test = ["scipy>=1.15,<2"]
+
+[project.scripts]
+quantum-classroom = "quantum_classroom.ui.app:main"
+quantum-classroom-verify = "quantum_classroom.verify:main"
+quantum-classroom-verify-atoms = "quantum_classroom.verify_atoms:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"quantum_classroom.activities" = ["catalog.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+markers = ["gui: native Qt tests (requires desktop and gui-test extras)"]

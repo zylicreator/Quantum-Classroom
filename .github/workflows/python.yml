@@ -1,0 +1,48 @@
+name: Verify Python core and Linux desktop widgets
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ['ubuntu:24.04', 'ubuntu:26.04', 'fedora:44']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Core and offscreen GUI in the named distribution
+        run: bash scripts/test_linux_container.sh '${{ matrix.image }}'
+      - name: Reports and native widget screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-linux-${{ strategy.job-index }}
+          path: artifacts/
+
+  core-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ['3.11', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '${{ matrix.python }}'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install '.[test,science-test]' build
+          .venv/bin/python -m pytest tests/python/test_core.py tests/python/test_atoms.py tests/python/test_activities.py tests/python/test_records.py -q
+          .venv/bin/python -m build

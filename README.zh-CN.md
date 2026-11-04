@@ -6,7 +6,7 @@
 
 一次测量得到一个点，许多次独立测量逐渐呈现概率分布。
 
-本项目在 AI 辅助下开发。学生可以先预测，再模拟位置测量，比较实验频率与模型概率，最后解释观察到的现象。软件支持中英文，完全在浏览器中运行，可离线使用。
+本项目在 AI 辅助下开发。学生可以先预测，再模拟位置测量，比较实验频率与模型概率，最后解释观察到的现象。现有网页版支持中英文，完全在浏览器中运行，可离线使用；另提供原生 Python 原子轨道与 H₂⁺ 桌面实验。
 
 ![H₂⁺ 分子轨道实验：反键电子云与中央观察薄片](docs/images/molecular-orbitals.png)
 
@@ -19,6 +19,29 @@
 使用软件不需要安装依赖、登录账户、启动服务器或联网。`electron-cloud-classroom.html` 是同一款独立应用的另一文件名。在 GitHub 页面直接点击 HTML 会看到源码，下载后才能在本地运行。
 
 ## 可以探索什么
+
+### Python 桌面预览版 · 原子与 H₂⁺
+
+桌面版提供独立的 NumPy 核心和可选 PySide6 原生界面。已迁移氢原子 1s–4f 共 30 个空间轨道、118 个元素的 Slater 屏蔽单轨道及整个原子球对称混合，同时保留 H₂⁺ 实验。Z=93–118 明确标为理想填充示意，不代表实测基态。切换实验室会暂停测量并保留两边的实验。
+
+两个实验室均支持无截断抽样、全部测量统计、旋转／投影、频率及径向／轴向曲线、中英文与 JSON 导出。第三阶段已加入 5 个双语任务、7 个教师预设、成组重复实验、投影大字模式和完整课堂记录保存／恢复。教师载入不代替学生提交预测，自由解释不自动评分。详见[第三阶段验证记录](docs/PHASE3_VALIDATION.md)与[记录格式](docs/CLASSROOM_RECORDS.md)。
+
+先按[中文安装说明](docs/LINUX_PYTHON.zh-CN.md)或 [English guide](docs/LINUX_PYTHON.md)安装 Linux 系统依赖，然后运行：
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -e '.[desktop,test,gui-test,science-test]'
+.venv/bin/quantum-classroom
+
+# 无需显示窗口：
+.venv/bin/quantum-classroom-verify
+.venv/bin/quantum-classroom-verify-atoms
+QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/python -q
+```
+
+实际验证范围与后续工作见[第三阶段验证记录](docs/PHASE3_VALIDATION.md)；第[一](docs/PHASE1_VALIDATION.md)、[二](docs/PHASE2_VALIDATION.md)阶段记录保留为历史说明。
+
+### 现有网页版
 
 | 实验室 | 模型与活动 |
 | --- | --- |
@@ -37,7 +60,7 @@
 
 每个点来自独立制备的同一选定状态的一次位置测量。它们不是电子运动轨迹，也不表示许多电子同时存在。任务中的最低观察次数只是教学门槛，不是保证准确收敛的数学阈值。
 
-本次实验和答案保存在页面内存中，刷新或关闭前请导出记录。目前不提供 JSON 导入或进度恢复。软件没有后端；只有主动点击参考资料链接时才会打开外部网站。
+网页版的实验和答案保存在页面内存中，刷新或关闭前请导出记录。目前不提供 JSON 导入或进度恢复。软件没有后端；只有主动点击参考资料链接时才会打开外部网站。
 
 ## 理解模型的边界
 
